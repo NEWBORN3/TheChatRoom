@@ -5,20 +5,27 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import java.awt.Color;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import java.awt.BorderLayout;
 import javax.swing.JButton;
 import java.awt.SystemColor;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.GridLayout;
+
 import javax.swing.UIManager;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
+import javax.swing.JComboBox;
 
-public class ChatUI {
+public class ChatUI implements ActionListener {
 
-	private JFrame frmTheChatRoom;
-
+	JFrame frmTheChatRoom;
+	private JPanel joinPanel,ChatPanel;
+	private JTextField userField;
+	private JButton joinButton;
 	/**
 	 * Launch the application.
 	 */
@@ -50,53 +57,132 @@ public class ChatUI {
 		frmTheChatRoom.setTitle("The Chat Room");
 		frmTheChatRoom.setBackground(Color.WHITE);
 		frmTheChatRoom.getContentPane().setBackground(Color.DARK_GRAY);
-		frmTheChatRoom.getContentPane().setLayout(null);
+		frmTheChatRoom.setResizable(false);
+		// Join Room Windows
+		joinPanel = new JPanel();
+		joinPanel.setBounds(33, 38, 488, 318);
+		joinPanel.setBackground(Color.WHITE);
+		joinPanel.setBackground(Color.DARK_GRAY);
+		frmTheChatRoom.getContentPane().add(joinPanel, BorderLayout.CENTER);
+		joinPanel.setLayout(null);
 		
-		JPanel panel = new JPanel();
-		panel.setBounds(33, 38, 331, 318);
-		frmTheChatRoom.getContentPane().add(panel);
+		//visibility
 		
-		JButton btnNewButton = new JButton("Send");
-		btnNewButton.setForeground(SystemColor.controlText);
-		btnNewButton.setBackground(SystemColor.activeCaption);
-		btnNewButton.setFont(new Font("Georgia", Font.PLAIN, 17));
-		btnNewButton.addActionListener(new ActionListener() {
+		
+		
+		JLabel userFieldLabel = new JLabel("UserName:");
+		userFieldLabel.setBounds(143, 126, 97, 32);
+		userFieldLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
+		userFieldLabel.setBackground(SystemColor.activeCaption);
+		userFieldLabel.setForeground(new Color(250, 250, 210));
+		joinPanel.add(userFieldLabel);
+		
+		userField = new JTextField();
+		userField.setBounds(250, 135, 123, 20);
+		joinPanel.add(userField);
+		userField.setColumns(10);
+		
+		joinButton = new JButton("Join Room");
+		joinButton.setBounds(276, 223, 97, 23);
+		joinButton.addActionListener(this);
+		joinButton.setForeground(SystemColor.controlText);
+		joinButton.setBackground(SystemColor.activeCaption);
+		joinButton.setFont(new Font("Georgia", Font.PLAIN, 12));
+		joinPanel.add(joinButton);
+		
+		JLabel ChatLabel = new JLabel("Chat Room:");
+		ChatLabel.setBounds(143, 175, 97, 14);
+		ChatLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
+		ChatLabel.setBackground(SystemColor.activeCaption);
+		ChatLabel.setForeground(new Color(250, 250, 210));
+		joinPanel.add(ChatLabel);
+		
+		JComboBox RoomcomboBox = new JComboBox();
+		RoomcomboBox.setBounds(250, 174, 123, 22);
+		joinPanel.add(RoomcomboBox);
+		frmTheChatRoom.setBounds(100, 100, 633, 457);
+		frmTheChatRoom.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//*********************************** Join Room Panel ended 
+		
+		
+		
+		//*********************************** Chat Room 
+		ChatPanel = new JPanel();
+		ChatPanel.setBounds(33, 38, 331, 318);
+		ChatPanel.setBackground(Color.WHITE);
+		ChatPanel.setBackground(Color.DARK_GRAY);
+		frmTheChatRoom.getContentPane().add(ChatPanel, BorderLayout.CENTER);
+		ChatPanel.setLayout(null);
+		ChatPanel.setVisible(false);
+		
+		JPanel ChatAreaPanel = new JPanel();
+		ChatAreaPanel.setBounds(33, 38, 331, 318);
+		ChatPanel.add(ChatAreaPanel);
+		
+		JButton sendButton = new JButton("Send");
+		sendButton.setForeground(SystemColor.controlText);
+		sendButton.setBackground(SystemColor.activeCaption);
+		sendButton.setFont(new Font("Georgia", Font.PLAIN, 17));
+		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		btnNewButton.setBounds(287, 376, 77, 21);
-		frmTheChatRoom.getContentPane().add(btnNewButton);
+		sendButton.setBounds(287, 376, 77, 21);
+		ChatPanel.add(sendButton);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBackground(Color.LIGHT_GRAY);
-		panel_1.setBounds(393, 38, 214, 318);
-		frmTheChatRoom.getContentPane().add(panel_1);
+		JPanel ActiveUserPanel = new JPanel();
+		ActiveUserPanel.setBackground(Color.LIGHT_GRAY);
+		ActiveUserPanel.setBounds(393, 38, 214, 318);
+		ChatPanel.add(ActiveUserPanel);
 		
-		JLabel lblNewLabel = new JLabel("Chat Area");
-		lblNewLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
-		lblNewLabel.setBackground(SystemColor.activeCaption);
-		lblNewLabel.setForeground(new Color(250, 250, 210));
-		lblNewLabel.setBounds(33, 11, 108, 31);
-		frmTheChatRoom.getContentPane().add(lblNewLabel);
+	
 		
-		JLabel lblActiveUsers = new JLabel("Active Users");
-		lblActiveUsers.setForeground(new Color(250, 250, 210));
-		lblActiveUsers.setFont(new Font("Georgia", Font.PLAIN, 18));
-		lblActiveUsers.setBackground(SystemColor.activeCaption);
-		lblActiveUsers.setBounds(457, 16, 108, 21);
-		frmTheChatRoom.getContentPane().add(lblActiveUsers);
+		JLabel ChatAreaLabel = new JLabel("Chat Area");
+		ChatAreaLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
+		ChatAreaLabel.setBackground(SystemColor.activeCaption);
+		ChatAreaLabel.setForeground(new Color(250, 250, 210));
+		ChatAreaLabel.setBounds(33, 11, 108, 31);
+		ChatPanel.add(ChatAreaLabel);
 		
-		JTextPane textPane = new JTextPane();
-		textPane.setBounds(33, 376, 244, 21);
-		frmTheChatRoom.getContentPane().add(textPane);
+		JLabel ActiveUsersLabel = new JLabel("Active Users");
+		ActiveUsersLabel.setForeground(new Color(250, 250, 210));
+		ActiveUsersLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
+		ActiveUsersLabel.setBackground(SystemColor.activeCaption);
+		ActiveUsersLabel.setBounds(457, 16, 108, 21);
+		ChatPanel.add(ActiveUsersLabel);
+		
+		JTextPane chatTextFiled = new JTextPane();
+		chatTextFiled.setBounds(33, 376, 244, 21);
+		ChatPanel.add(chatTextFiled);
 		
 		JButton btnLeave = new JButton("Leave");
-		btnLeave.setForeground(Color.BLACK);
+		btnLeave.setForeground(SystemColor.controlText);
 		btnLeave.setFont(new Font("Georgia", Font.PLAIN, 17));
 		btnLeave.setBackground(SystemColor.activeCaption);
-		btnLeave.setBounds(530, 376, 77, 21);
-		frmTheChatRoom.getContentPane().add(btnLeave);
-		frmTheChatRoom.setBounds(100, 100, 633, 457);
-		frmTheChatRoom.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		btnLeave.setBounds(517, 376, 77, 21);
+		ChatPanel.add(btnLeave);
+		
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		try {
+			if(e.getSource() == joinButton)
+			{
+				
+				joinPanel.setVisible(false);
+				ChatPanel.setVisible(true);
+				
+			}
+			
+		} catch(Exception err) {
+			System.err.println(err.toString());
+			err.printStackTrace();
+		}
+	}
+	
+	
+	
+
 }
