@@ -5,9 +5,12 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import java.awt.Color;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import java.awt.BorderLayout;
+
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.SystemColor;
 import java.awt.event.ActionListener;
@@ -16,16 +19,25 @@ import java.awt.Font;
 import java.awt.GridLayout;
 
 import javax.swing.UIManager;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.JComboBox;
 
 public class ChatUI implements ActionListener {
 
 	JFrame frmTheChatRoom;
-	private JPanel joinPanel,ChatPanel;
+	protected JPanel joinPanel,ChatPanel,ActiveUserPanel;
 	private JTextField userField;
 	private JButton joinButton;
+	private String user;
+	private JList<String> _userList;
+	private List<String> users;
 	/**
 	 * Launch the application.
 	 */
@@ -130,7 +142,7 @@ public class ChatUI implements ActionListener {
 		sendButton.setBounds(287, 376, 77, 21);
 		ChatPanel.add(sendButton);
 		
-		JPanel ActiveUserPanel = new JPanel();
+		ActiveUserPanel = new JPanel();
 		ActiveUserPanel.setBackground(Color.LIGHT_GRAY);
 		ActiveUserPanel.setBounds(393, 38, 214, 318);
 		ChatPanel.add(ActiveUserPanel);
@@ -162,17 +174,39 @@ public class ChatUI implements ActionListener {
 		btnLeave.setBounds(517, 376, 77, 21);
 		ChatPanel.add(btnLeave);
 		
+		_userList = new JList<String>();
+		_userList.setBackground(Color.LIGHT_GRAY);
+		_userList.setFont(new Font("Georgia", Font.PLAIN, 12));
+        _userList.setVisibleRowCount(6);
 	}
-
+	
+	public void updateList(String[] userList)
+	{
+		users = new ArrayList<String>();
+		
+		System.out.println("pol");
+        
+		for(String s : userList){
+        	users.add(s);
+        	System.out.println(s+ "pol");
+        }
+        
+		JScrollPane listScrollPane = new JScrollPane(_userList);
+		ActiveUserPanel.add(listScrollPane,BorderLayout.CENTER);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		try {
 			if(e.getSource() == joinButton)
 			{
-				
+				user = userField.getText();
 				joinPanel.setVisible(false);
 				ChatPanel.setVisible(true);
+				Client nC = new Client(this,user);
+				nC.clientStart();
+				System.out.println("iooo");
 				
 			}
 			
