@@ -19,15 +19,14 @@ import ChatRoomServer.IServer;
 
 public class Client extends UnicastRemoteObject implements IClient {
 	
-	private IServer ser;
-	ChatUI gui;
+	public  IServer ser;
+	public  ChatUI gui;
 	private String _userName;
 	
-	public Client(ChatUI gui, String userName) throws RemoteException{
+	public Client(ChatUI gui) throws RemoteException{
 		// TODO Auto-generated constructor stub
 		super();
 		this.gui = gui;
-		this._userName = userName;
 	}
 	
 	public void clientStart() throws RemoteException {
@@ -36,7 +35,6 @@ public class Client extends UnicastRemoteObject implements IClient {
 			Registry reg = LocateRegistry.getRegistry(null);
 			ser = (IServer) reg.lookup("The Chat room");	
 			System.out.println("Client is running nuss...\n*****");
-			registerToServer();
 		} 
 		catch (Exception  e) {
 			System.out.println(e.toString());
@@ -44,8 +42,9 @@ public class Client extends UnicastRemoteObject implements IClient {
 		
 	}
 	
-	public void registerToServer() throws RemoteException {
+	public void registerToServer(String userName) throws RemoteException {
 		try {
+			this._userName = userName;
 			System.out.println("Clien now here:  " + _userName);
 			ser.registerClient(_userName,this);
 		} catch(Exception e) {
@@ -56,9 +55,10 @@ public class Client extends UnicastRemoteObject implements IClient {
 	@Override
 	public void ActiveUserList(String[] currentUsers) throws RemoteException {
 		// TODO Auto-generated method stub
-		//gui.setClientPanel(currentUsers);
+		gui.ChatPanel.remove(gui.listScrollPane);
+		gui.ChatPanel.remove(gui._userList);
 		gui.updateList(currentUsers);
-		gui.ActiveUserPanel.repaint();
-		gui.ActiveUserPanel.revalidate();
+		gui.ChatPanel.repaint();
+		gui.ChatPanel.revalidate();
 	}
 }

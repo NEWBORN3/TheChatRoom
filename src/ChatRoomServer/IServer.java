@@ -7,4 +7,5 @@ import ChatRoomClient.IClient;
 
 public interface IServer extends Remote {
 	public void registerClient(String name,IClient cli) throws RemoteException;
+	public boolean isUserUnique(String name) throws RemoteException;
 }

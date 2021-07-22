@@ -14,6 +14,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.SystemColor;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -28,16 +29,22 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.JComboBox;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
 
 public class ChatUI implements ActionListener {
 
 	JFrame frmTheChatRoom;
-	protected JPanel joinPanel,ChatPanel,ActiveUserPanel;
+	protected JPanel joinPanel,ChatPanel, ActiveUserPanel;
 	private JTextField userField;
 	private JButton joinButton;
 	private String user;
-	private JList<String> _userList;
-	private List<String> users;
+	public JList<String> _userList;
+	private DefaultListModel<String> users;
+	public JScrollPane listScrollPane;
+	private JLabel cautionLabel;
+	private Client nC;
 	/**
 	 * Launch the application.
 	 */
@@ -57,20 +64,26 @@ public class ChatUI implements ActionListener {
 	/**
 	 * Create the application.
 	 */
-	public ChatUI() {
+	public ChatUI() throws RemoteException {
 		initialize();
+		nC = new Client(this);
+		nC.clientStart();
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		
 		frmTheChatRoom = new JFrame();
 		frmTheChatRoom.setTitle("The Chat Room");
 		frmTheChatRoom.setBackground(Color.WHITE);
 		frmTheChatRoom.getContentPane().setBackground(Color.DARK_GRAY);
 		frmTheChatRoom.setResizable(false);
+		frmTheChatRoom.setBounds(100, 100, 633, 457);
+		frmTheChatRoom.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// Join Room Windows
+		
 		joinPanel = new JPanel();
 		joinPanel.setBounds(33, 38, 488, 318);
 		joinPanel.setBackground(Color.WHITE);
@@ -79,8 +92,6 @@ public class ChatUI implements ActionListener {
 		joinPanel.setLayout(null);
 		
 		//visibility
-		
-		
 		
 		JLabel userFieldLabel = new JLabel("UserName:");
 		userFieldLabel.setBounds(143, 126, 97, 32);
@@ -112,11 +123,15 @@ public class ChatUI implements ActionListener {
 		JComboBox RoomcomboBox = new JComboBox();
 		RoomcomboBox.setBounds(250, 174, 123, 22);
 		joinPanel.add(RoomcomboBox);
-		frmTheChatRoom.setBounds(100, 100, 633, 457);
-		frmTheChatRoom.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		cautionLabel = new JLabel();
+		cautionLabel.setFont(new Font("Georgia", Font.PLAIN, 12));
+		cautionLabel.setForeground(Color.RED);
+		cautionLabel.setBounds(215, 198, 263, 23);
+		joinPanel.add(cautionLabel);
+		
+		
 		//*********************************** Join Room Panel ended 
-		
-		
 		
 		//*********************************** Chat Room 
 		ChatPanel = new JPanel();
@@ -142,12 +157,10 @@ public class ChatUI implements ActionListener {
 		sendButton.setBounds(287, 376, 77, 21);
 		ChatPanel.add(sendButton);
 		
-		ActiveUserPanel = new JPanel();
-		ActiveUserPanel.setBackground(Color.LIGHT_GRAY);
-		ActiveUserPanel.setBounds(393, 38, 214, 318);
-		ChatPanel.add(ActiveUserPanel);
-		
-	
+//		ActiveUserPanel = new JPanel();
+//		ActiveUserPanel.setBackground(Color.LIGHT_GRAY);
+//		ActiveUserPanel.setBounds(393, 38, 214, 318);
+//		ChatPanel.add(ActiveUserPanel);
 		
 		JLabel ChatAreaLabel = new JLabel("Chat Area");
 		ChatAreaLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
@@ -174,25 +187,45 @@ public class ChatUI implements ActionListener {
 		btnLeave.setBounds(517, 376, 77, 21);
 		ChatPanel.add(btnLeave);
 		
-		_userList = new JList<String>();
+		users = new DefaultListModel<String>();
+		_userList = new JList<String>(users);
+		_userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		_userList.setForeground(Color.BLACK);
 		_userList.setBackground(Color.LIGHT_GRAY);
-		_userList.setFont(new Font("Georgia", Font.PLAIN, 12));
+		_userList.setBounds(393, 38, 214, 318);
+		_userList.setFont(new Font("Georgia", Font.PLAIN, 18));
         _userList.setVisibleRowCount(6);
-	}
+        ChatPanel.add(_userList);
+        
+        listScrollPane = new JScrollPane(_userList);
+        listScrollPane.setBounds(393, 38, 214, 318);
+        ChatPanel.add(listScrollPane);
+        
+        
+		
+}
 	
 	public void updateList(String[] userList)
 	{
-		users = new ArrayList<String>();
 		
 		System.out.println("pol");
-        
+		users = new DefaultListModel<String>();
 		for(String s : userList){
-        	users.add(s);
+        	users.addElement(s);
         	System.out.println(s+ "pol");
         }
+		_userList = new JList<String>(users);
+		_userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		_userList.setForeground(Color.BLACK);
+		_userList.setBackground(Color.LIGHT_GRAY);
+		_userList.setBounds(393, 38, 214, 318);
+		_userList.setFont(new Font("Georgia", Font.PLAIN, 18));
+        _userList.setVisibleRowCount(6);
+        ChatPanel.add(_userList);
         
-		JScrollPane listScrollPane = new JScrollPane(_userList);
-		ActiveUserPanel.add(listScrollPane,BorderLayout.CENTER);
+		listScrollPane = new JScrollPane(_userList);
+        listScrollPane.setBounds(393, 38, 214, 318);
+        ChatPanel.add(listScrollPane);
 	}
 	
 	@Override
@@ -201,22 +234,36 @@ public class ChatUI implements ActionListener {
 		try {
 			if(e.getSource() == joinButton)
 			{
-				user = userField.getText();
-				joinPanel.setVisible(false);
-				ChatPanel.setVisible(true);
-				Client nC = new Client(this,user);
-				nC.clientStart();
-				System.out.println("iooo");
-				
-			}
+				if(userField.getText().length() != 0) 
+				{
+					if(checkUniqueName()) {
+						user = userField.getText();
+						nC.registerToServer(user);
+						joinPanel.setVisible(false);
+						ChatPanel.setVisible(true);
+						frmTheChatRoom.setTitle("The Chat Room - " + user+"'s Window" );
+						System.out.println("iooo");
+					} else {
+						cautionLabel.setText("UserName exist, Change UserName");
+					}
+				}
+				else{
+					cautionLabel.setText("UserName is required");
+				}
 			
-		} catch(Exception err) {
+			}		
+		}
+		catch(Exception err) {
 			System.err.println(err.toString());
 			err.printStackTrace();
 		}
 	}
 	
 	
-	
-
+	public boolean checkUniqueName() throws RemoteException
+	{
+		boolean isUserValid;
+		isUserValid = nC.ser.isUserUnique(userField.getText());
+		return isUserValid;
+	}
 }
