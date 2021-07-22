@@ -22,6 +22,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,6 +58,7 @@ public class ChatUI implements ActionListener {
 			public void run() {
 				try {
 					ChatUI window = new ChatUI();
+					window.frmTheChatRoom.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 					window.frmTheChatRoom.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -253,6 +255,7 @@ public class ChatUI implements ActionListener {
 						joinPanel.setVisible(false);
 						ChatPanel.setVisible(true);
 						frmTheChatRoom.setTitle("The Chat Room - " + user+"'s Window" );
+						ChatArea.append("[ChatRoom Server] " + user + " Welcome to the chat room \n" );
 						System.out.println("iooo");
 					} else {
 						cautionLabel.setText("UserName exist, Change UserName");
@@ -265,6 +268,7 @@ public class ChatUI implements ActionListener {
 			}
 			
 			if(e.getSource() == btnLeave) {
+				nC.ser.chat(user, "I'm leaving, Nice Chatting with you guys.");
 				nC.ser.leaveUser(user);
 				System.out.println("this"+user);
 				frmTheChatRoom.dispose();

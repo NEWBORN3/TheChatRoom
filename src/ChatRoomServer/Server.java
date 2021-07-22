@@ -121,16 +121,23 @@ public class Server extends UnicastRemoteObject implements IServer {
 		{
 			if(us.getUsername().equals(name))
 			{
-				System.out.println("-- "+ us.getUsername() + " Left The Chat Room" );
+				System.out.println("-- "+ us.getUsername() + " Left The Chat Room at " + myFormatObj.format(LocalDateTime.now()));
 				activeUser.remove(us);
+				sendLeaveNote(us.getUsername());
 				updateActiveUser();
 				break;
-				
 			}
 		}
 		
 	}
-
+	
+	public void sendLeaveNote(String nameOf) throws RemoteException {
+		for(UserModel us: activeUser )
+		{
+			us.getClient().LeaveNote("[ChatRoom Server] " + nameOf + " Left the Chat room \n");
+		}
+	}
+	
 	@Override
 	public void chat(String sender, String message) throws RemoteException {
 		// TODO Auto-generated method stub

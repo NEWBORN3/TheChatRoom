@@ -30,11 +30,9 @@ public class Client extends UnicastRemoteObject implements IClient {
 	}
 	
 	public void clientStart() throws RemoteException {
-		System.out.println("Client is r*****");
 		try {
 			Registry reg = LocateRegistry.getRegistry(null);
 			ser = (IServer) reg.lookup("The Chat room");	
-			System.out.println("Client is running");
 		} 
 		catch (Exception  e) {
 			System.out.println(e.toString());
@@ -45,7 +43,6 @@ public class Client extends UnicastRemoteObject implements IClient {
 	public void registerToServer(String userName) throws RemoteException {
 		try {
 			this._userName = userName;
-			System.out.println("Client:-  " + _userName);
 			ser.registerClient(_userName,this);
 		} catch(Exception e) {
 			
@@ -67,4 +64,13 @@ public class Client extends UnicastRemoteObject implements IClient {
 		// TODO Auto-generated method stub
 		gui.ChatArea.append(received);
 	}
+
+	@Override
+	public void LeaveNote(String msg) throws RemoteException {
+		// TODO Auto-generated method stub
+		gui.ChatArea.append(msg);
+		System.out.print("wegooot"+ msg);
+	}
+	
+	
 }
