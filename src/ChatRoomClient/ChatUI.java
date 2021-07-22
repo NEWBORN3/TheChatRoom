@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import java.awt.Color;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import java.awt.BorderLayout;
@@ -18,6 +19,7 @@ import java.rmi.RemoteException;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Insets;
 
 import javax.swing.UIManager;
 
@@ -37,14 +39,16 @@ public class ChatUI implements ActionListener {
 
 	JFrame frmTheChatRoom;
 	protected JPanel joinPanel,ChatPanel, ActiveUserPanel;
-	private JTextField userField;
-	private JButton joinButton;
+	private JTextField userField, chatTextField;
+	private JButton joinButton, btnLeave, sendButton;
 	private String user;
 	public JList<String> _userList;
 	private DefaultListModel<String> users;
 	public JScrollPane listScrollPane;
 	private JLabel cautionLabel;
 	private Client nC;
+	public JTextArea ChatArea;
+	private String msg;
 	/**
 	 * Launch the application.
 	 */
@@ -142,25 +146,25 @@ public class ChatUI implements ActionListener {
 		ChatPanel.setLayout(null);
 		ChatPanel.setVisible(false);
 		
-		JPanel ChatAreaPanel = new JPanel();
-		ChatAreaPanel.setBounds(33, 38, 331, 318);
-		ChatPanel.add(ChatAreaPanel);
+		ChatArea = new JTextArea();
 		
-		JButton sendButton = new JButton("Send");
+		ChatArea.setBackground(Color.LIGHT_GRAY);
+		ChatArea.setLineWrap(true);
+		ChatArea.setMargin(new Insets(10, 10, 10, 10));
+		ChatArea.setWrapStyleWord(true);
+		cautionLabel.setFont(new Font("Georgia", Font.PLAIN, 12));
+		ChatArea.setEditable(false);
+		ChatArea.setBounds(33, 38, 331, 318);
+		ChatPanel.add(ChatArea);
+		
+		sendButton = new JButton("Send");
 		sendButton.setForeground(SystemColor.controlText);
 		sendButton.setBackground(SystemColor.activeCaption);
 		sendButton.setFont(new Font("Georgia", Font.PLAIN, 17));
-		sendButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		sendButton.addActionListener(this);
 		sendButton.setBounds(287, 376, 77, 21);
 		ChatPanel.add(sendButton);
 		
-//		ActiveUserPanel = new JPanel();
-//		ActiveUserPanel.setBackground(Color.LIGHT_GRAY);
-//		ActiveUserPanel.setBounds(393, 38, 214, 318);
-//		ChatPanel.add(ActiveUserPanel);
 		
 		JLabel ChatAreaLabel = new JLabel("Chat Area");
 		ChatAreaLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
@@ -176,15 +180,16 @@ public class ChatUI implements ActionListener {
 		ActiveUsersLabel.setBounds(457, 16, 108, 21);
 		ChatPanel.add(ActiveUsersLabel);
 		
-		JTextPane chatTextFiled = new JTextPane();
-		chatTextFiled.setBounds(33, 376, 244, 21);
-		ChatPanel.add(chatTextFiled);
+		chatTextField = new JTextField();
+		chatTextField.setBounds(33, 376, 244, 21);
+		ChatPanel.add(chatTextField);
 		
-		JButton btnLeave = new JButton("Leave");
+		btnLeave = new JButton("Leave");
 		btnLeave.setForeground(SystemColor.controlText);
 		btnLeave.setFont(new Font("Georgia", Font.PLAIN, 17));
 		btnLeave.setBackground(SystemColor.activeCaption);
 		btnLeave.setBounds(517, 376, 77, 21);
+		btnLeave.addActionListener(this);
 		ChatPanel.add(btnLeave);
 		
 		users = new DefaultListModel<String>();
@@ -214,6 +219,8 @@ public class ChatUI implements ActionListener {
         	users.addElement(s);
         	System.out.println(s+ "pol");
         }
+		System.out.println("===="+userList.length);
+		
 		_userList = new JList<String>(users);
 		_userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		_userList.setForeground(Color.BLACK);
@@ -226,6 +233,10 @@ public class ChatUI implements ActionListener {
 		listScrollPane = new JScrollPane(_userList);
         listScrollPane.setBounds(393, 38, 214, 318);
         ChatPanel.add(listScrollPane);
+        if(userList.length == 1)
+		{
+			btnLeave.setEnabled(false);
+		}
 	}
 	
 	@Override
@@ -251,7 +262,21 @@ public class ChatUI implements ActionListener {
 					cautionLabel.setText("UserName is required");
 				}
 			
-			}		
+			}
+			
+			if(e.getSource() == btnLeave) {
+				nC.ser.leaveUser(user);
+				System.out.println("this"+user);
+				frmTheChatRoom.dispose();
+				System.exit(0);
+			} 
+			
+			if(e.getSource() == sendButton) {
+				msg = chatTextField.getText();
+				chatTextField.setText("");
+				nC.ser.chat(user,msg);
+				System.out.println("Sending message.... " + msg);
+			}
 		}
 		catch(Exception err) {
 			System.err.println(err.toString());

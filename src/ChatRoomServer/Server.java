@@ -4,7 +4,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import ChatRoomClient.IClient;
 
@@ -18,7 +19,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 	public Server() throws RemoteException {
 		// TODO Auto-generated constructor stub
 	}
-
+	private DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		// start rmi registry server
@@ -36,7 +37,8 @@ public class Server extends UnicastRemoteObject implements IServer {
 			
 			//binding the remote object(stub) in the registry
 			reg.bind("The Chat room", ser);
-			System.out.println("-----------server is ready-------------");
+			System.out.println(" ");
+			System.out.println("-----------Server is Running-------------");
 			
 			
 		}catch(Exception e)
@@ -62,14 +64,9 @@ public class Server extends UnicastRemoteObject implements IServer {
 		// TODO Auto-generated method stub
 		try 
 		{
-			System.out.println(name+"n then");
 			activeUser.add(new UserModel(name,cli));
-			for(UserModel usi : activeUser)
-			{
-				System.out.println(usi.getUsername()+"oo");
-			}
-			System.out.println("well");
-			System.out.println("-----hfa=----");
+			System.out.println(cli);
+			System.out.println(name+ "Joined at : "+ myFormatObj.format(LocalDateTime.now()));
 			updateActiveUser();
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -79,15 +76,12 @@ public class Server extends UnicastRemoteObject implements IServer {
 	
 	private void updateActiveUser() {
 		String[] currentUsers = getUserList();
-		System.out.println("-----hfa=----09");
+		System.out.println("---------------");
 		for(UserModel c : activeUser){
 			try {
-				c.getClient().ActiveUserList(currentUsers);
-				System.out.println(c.getUsername()+"o00000o");
-				
+				c.getClient().ActiveUserList(currentUsers);	
 			} 
 			catch (RemoteException e) {
-				System.out.println("Samuer");
 				e.printStackTrace();
 			}
 		}	
@@ -96,9 +90,10 @@ public class Server extends UnicastRemoteObject implements IServer {
 	private String[] getUserList(){
 		// generate an array of current users
 		String[] allUsers = new String[activeUser.size()];
+		System.out.println("**Chat Members**");
 		for(int i = 0; i< allUsers.length; i++){
 			allUsers[i] = activeUser.get(i).getUsername();
-			System.out.println(allUsers[i]+"moi");
+			System.out.println(" : "+ allUsers[i]);
 		}
 		return allUsers;
 	}
@@ -117,6 +112,34 @@ public class Server extends UnicastRemoteObject implements IServer {
 			}
 		}
 		return isUnique;
+	}
+
+	@Override
+	public void leaveUser(String name) throws RemoteException {
+		// TODO Auto-generated method stub
+		for(UserModel us: activeUser )
+		{
+			if(us.getUsername().equals(name))
+			{
+				System.out.println("-- "+ us.getUsername() + " Left The Chat Room" );
+				activeUser.remove(us);
+				updateActiveUser();
+				break;
+				
+			}
+		}
+		
+	}
+
+	@Override
+	public void chat(String sender, String message) throws RemoteException {
+		// TODO Auto-generated method stub
+		System.out.println("ChatLog++ : " + sender.toUpperCase() + " :  " + message );
+		for(UserModel us : activeUser)
+		{
+			us.getClient().ReceivedMessage(sender.toUpperCase() + " :  " + message + "\n");
+		}
+		
 	}
 	
 }
