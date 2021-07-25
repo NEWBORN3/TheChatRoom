@@ -40,7 +40,7 @@ public class ChatUI implements ActionListener {
 
 	JFrame frmTheChatRoom;
 	protected JPanel joinPanel,ChatPanel, ActiveUserPanel;
-	private JTextField userField, chatTextField;
+	private JTextField userField, chatTextField, serverField;
 	private JButton joinButton, btnLeave, sendButton;
 	private String user;
 	public JList<String> _userList;
@@ -72,8 +72,6 @@ public class ChatUI implements ActionListener {
 	 */
 	public ChatUI() throws RemoteException {
 		initialize();
-		nC = new Client(this);
-		nC.clientStart();
 	}
 
 	/**
@@ -119,16 +117,16 @@ public class ChatUI implements ActionListener {
 		joinButton.setFont(new Font("Georgia", Font.PLAIN, 12));
 		joinPanel.add(joinButton);
 		
-		JLabel ChatLabel = new JLabel("Chat Room:");
+		JLabel ChatLabel = new JLabel("[Server]:");
 		ChatLabel.setBounds(143, 175, 97, 14);
 		ChatLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
 		ChatLabel.setBackground(SystemColor.activeCaption);
 		ChatLabel.setForeground(new Color(250, 250, 210));
 		joinPanel.add(ChatLabel);
 		
-		JComboBox RoomcomboBox = new JComboBox();
-		RoomcomboBox.setBounds(250, 174, 123, 22);
-		joinPanel.add(RoomcomboBox);
+		serverField = new JTextField();
+		serverField.setBounds(250, 174, 123, 22);
+		joinPanel.add(serverField);
 		
 		cautionLabel = new JLabel();
 		cautionLabel.setFont(new Font("Georgia", Font.PLAIN, 12));
@@ -247,22 +245,27 @@ public class ChatUI implements ActionListener {
 		try {
 			if(e.getSource() == joinButton)
 			{
-				if(userField.getText().length() != 0) 
+				if(userField.getText().length() != 0 && serverField.getText().length() !=0 ) 
 				{
-					if(checkUniqueName()) {
-						user = userField.getText();
-						nC.registerToServer(user);
-						joinPanel.setVisible(false);
-						ChatPanel.setVisible(true);
-						frmTheChatRoom.setTitle("The Chat Room - " + user+"'s Window" );
-						ChatArea.append("[ChatRoom Server] " + user + " Welcome to the chat room \n" );
-						System.out.println("iooo");
+					if(checkServer(serverField.getText())) {
+						if(checkUniqueName())
+						{
+							System.out.println("heop");
+							user = userField.getText();
+//							nC = new Client(this);
+							nC.registerToServer(user);
+							joinPanel.setVisible(false);
+							ChatPanel.setVisible(true);
+							frmTheChatRoom.setTitle("The Chat Room - " + user+"'s Window" );
+							ChatArea.append("[ChatRoom Server] " + user + " Welcome to the chat room \n" );
+						} else {
+							cautionLabel.setText("UserName exist, Change UserName");
+						}
 					} else {
-						cautionLabel.setText("UserName exist, Change UserName");
-					}
-				}
-				else{
-					cautionLabel.setText("UserName is required");
+						cautionLabel.setText("Couldn't connect to the server, Change server");
+					}	
+				} else{
+					cautionLabel.setText("UserName and Server are required");
 				}
 			
 			}
@@ -288,11 +291,16 @@ public class ChatUI implements ActionListener {
 		}
 	}
 	
-	
 	public boolean checkUniqueName() throws RemoteException
 	{
 		boolean isUserValid;
 		isUserValid = nC.ser.isUserUnique(userField.getText());
 		return isUserValid;
+	}
+	public boolean checkServer(String sName) throws RemoteException
+	{
+//		boolean serverValid;
+		nC = new Client(this);
+		return nC.clientStart(sName);
 	}
 }

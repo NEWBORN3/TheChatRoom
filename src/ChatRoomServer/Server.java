@@ -36,7 +36,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 //			IServer stub = (IServer) UnicastRemoteObject.exportObject(ser,0);
 			
 			//binding the remote object(stub) in the registry
-			reg.bind("The Chat room", ser);
+			reg.bind("localhost", ser);
 			System.out.println(" ");
 			System.out.println("-----------Server is Running-------------");
 			

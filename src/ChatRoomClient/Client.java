@@ -29,15 +29,17 @@ public class Client extends UnicastRemoteObject implements IClient {
 		this.gui = gui;
 	}
 	
-	public void clientStart() throws RemoteException {
+	public Boolean clientStart(String sName) throws RemoteException {
 		try {
 			Registry reg = LocateRegistry.getRegistry(null);
-			ser = (IServer) reg.lookup("The Chat room");	
+			ser = (IServer) reg.lookup(sName);	//localhost
+			return true;
 		} 
 		catch (Exception  e) {
+			System.out.println("Could'nt Connect to server: ");
 			System.out.println(e.toString());
-		}
-		
+			return false;
+		}	
 	}
 	
 	public void registerToServer(String userName) throws RemoteException {
@@ -45,7 +47,7 @@ public class Client extends UnicastRemoteObject implements IClient {
 			this._userName = userName;
 			ser.registerClient(_userName,this);
 		} catch(Exception e) {
-			
+			System.out.println("Wonder io---");
 		}
 	}
 
