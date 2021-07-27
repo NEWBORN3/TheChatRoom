@@ -41,7 +41,7 @@ public class ChatUI implements ActionListener {
 	JFrame frmTheChatRoom;
 	protected JPanel joinPanel,ChatPanel, ActiveUserPanel;
 	private JTextField userField, chatTextField, serverField;
-	private JButton joinButton, btnLeave, sendButton;
+	private JButton joinButton, btnLeave, sendButton, sendPMButton;
 	private String user;
 	public JList<String> _userList;
 	private DefaultListModel<String> users;
@@ -165,6 +165,13 @@ public class ChatUI implements ActionListener {
 		sendButton.setBounds(287, 376, 77, 21);
 		ChatPanel.add(sendButton);
 		
+		sendPMButton = new JButton("PM");
+		sendPMButton.setForeground(SystemColor.controlText);
+		sendPMButton.setBackground(SystemColor.activeCaption);
+		sendPMButton.setFont(new Font("Georgia", Font.PLAIN, 17));
+		sendPMButton.addActionListener(this);
+		sendPMButton.setBounds(403, 376, 77, 21);
+		ChatPanel.add(sendPMButton);
 		
 		JLabel ChatAreaLabel = new JLabel("Chat Area");
 		ChatAreaLabel.setFont(new Font("Georgia", Font.PLAIN, 18));
@@ -194,7 +201,7 @@ public class ChatUI implements ActionListener {
 		
 		users = new DefaultListModel<String>();
 		_userList = new JList<String>(users);
-		_userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		_userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		_userList.setForeground(Color.BLACK);
 		_userList.setBackground(Color.LIGHT_GRAY);
 		_userList.setBounds(393, 38, 214, 318);
@@ -213,13 +220,10 @@ public class ChatUI implements ActionListener {
 	public void updateList(String[] userList)
 	{
 		
-		System.out.println("pol");
 		users = new DefaultListModel<String>();
 		for(String s : userList){
         	users.addElement(s);
-        	System.out.println(s+ "pol");
         }
-		System.out.println("===="+userList.length);
 		
 		_userList = new JList<String>(users);
 		_userList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -250,7 +254,6 @@ public class ChatUI implements ActionListener {
 					if(checkServer(serverField.getText())) {
 						if(checkUniqueName())
 						{
-							System.out.println("heop");
 							user = userField.getText();
 //							nC = new Client(this);
 							nC.registerToServer(user);
@@ -273,7 +276,6 @@ public class ChatUI implements ActionListener {
 			if(e.getSource() == btnLeave) {
 				nC.ser.chat(user, "I'm leaving, Nice Chatting with you guys.");
 				nC.ser.leaveUser(user);
-				System.out.println("this"+user);
 				frmTheChatRoom.dispose();
 				System.exit(0);
 			} 
@@ -282,7 +284,12 @@ public class ChatUI implements ActionListener {
 				msg = chatTextField.getText();
 				chatTextField.setText("");
 				nC.ser.chat(user,msg);
-				System.out.println("Sending message.... " + msg);
+			}
+			if(e.getSource() == sendPMButton) {
+				int receiver = _userList.getSelectedIndex();
+				msg = chatTextField.getText();
+				chatTextField.setText("");
+				nC.ser.chatPrivate(user, receiver, msg);
 			}
 		}
 		catch(Exception err) {

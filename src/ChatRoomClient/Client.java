@@ -47,9 +47,10 @@ public class Client extends UnicastRemoteObject implements IClient {
 			this._userName = userName;
 			ser.registerClient(_userName,this);
 		} catch(Exception e) {
-			System.out.println("Wonder io---");
+			System.out.println("Error registring client---"+ e.toString());
 		}
 	}
+	
 
 	@Override
 	public void ActiveUserList(String[] currentUsers) throws RemoteException {
@@ -71,7 +72,6 @@ public class Client extends UnicastRemoteObject implements IClient {
 	public void LeaveNote(String msg) throws RemoteException {
 		// TODO Auto-generated method stub
 		gui.ChatArea.append(msg);
-		System.out.print("wegooot"+ msg);
 	}
 	
 	

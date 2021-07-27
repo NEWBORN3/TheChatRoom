@@ -39,6 +39,7 @@ public class Server extends UnicastRemoteObject implements IServer {
 			reg.bind("localhost", ser);
 			System.out.println(" ");
 			System.out.println("-----------Server is Running-------------");
+			System.out.println(ser);
 			
 			
 		}catch(Exception e)
@@ -149,5 +150,19 @@ public class Server extends UnicastRemoteObject implements IServer {
 		
 	}
 	
+	@Override
+	public void chatPrivate(String sender,int receiver, String message) throws RemoteException {
+		// TODO Auto-generated method stub
+		UserModel pMReciver = activeUser.get(receiver);	
+		System.out.println("ChatLog++ : [PM] From "  +  sender + " to " + pMReciver.getUsername()+  " :  " + message );
+		for(UserModel us : activeUser)
+		{
+			if(us.getUsername().equals(sender)) {
+				us.getClient().ReceivedMessage(sender.toString().toUpperCase() + " :[PM]  " + message + "\n");
+		
+			}
+		}
+		pMReciver.getClient().ReceivedMessage(sender.toString().toUpperCase() + " :[PM]  " + message + "\n");
+	}
 }
 
